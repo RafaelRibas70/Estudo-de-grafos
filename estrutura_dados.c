@@ -43,7 +43,7 @@ void inserir_item_da_pilha(Tpilha *inicio, int dado){
     Titem_da_pilha *aux;
     aux = malloc(sizeof(Titem_da_pilha));
     aux->no = dado;
-    aux->proximo_no =NULL;
+    aux->proximo_no = inicio->inicio;
     inicio->inicio = aux;
 }
 
