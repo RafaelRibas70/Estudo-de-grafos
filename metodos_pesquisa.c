@@ -6,27 +6,30 @@
 void pesquisa_DFS(int qtd_vertice, int **matriz, int *vet_visitado, int vertice_inicio, int *vet_ordem) {
     Tpilha pilha;
     inicializar_pilha(&pilha);
-
-    int inicio = vertice_inicio - 1;
     int posicao = 0;
 
-    // Coloca apenas o vértice inicial na pilha
-    inserir_item_da_pilha(&pilha, inicio);
+    // Garante a visita a TODOS os vértices do grafo
+    for (int k = 0; k < qtd_vertice; k++) {
+        // Na primeira iteração começa no vértice escolhido; nas seguintes, testa de 0 a N-1
+        int v_atual = (k == 0) ? (vertice_inicio - 1) : k;
 
-    while (pilha.inicio != NULL) {
-        // Pega o vértice do topo e remove da pilha
-        int atual = pilha.inicio->no;
-        remover_item_da_pilha(&pilha);
+        if (vet_visitado[v_atual] == 0) {
+            inserir_item_da_pilha(&pilha, v_atual);
 
-        // Se ainda não foi visitado, processa agora    
-        if (vet_visitado[atual] == 0) {
-            vet_visitado[atual] = 1;
-            vet_ordem[posicao] = atual + 1;
-            posicao++;
+            while (pilha.inicio != NULL) {
+                int atual = pilha.inicio->no;
+                remover_item_da_pilha(&pilha);
 
-            for (int j = qtd_vertice - 1; j >= 0; j--) {
-                if (matriz[atual][j] == 1 && vet_visitado[j] == 0) {
-                    inserir_item_da_pilha(&pilha, j);
+                if (vet_visitado[atual] == 0) {
+                    vet_visitado[atual] = 1;
+                    vet_ordem[posicao] = atual + 1;
+                    posicao++;
+
+                    for (int j = qtd_vertice - 1; j >= 0; j--) {
+                        if (matriz[atual][j] == 1 && vet_visitado[j] == 0) {
+                            inserir_item_da_pilha(&pilha, j);
+                        }
+                    }
                 }
             }
         }
@@ -36,26 +39,31 @@ void pesquisa_DFS(int qtd_vertice, int **matriz, int *vet_visitado, int vertice_
 void pesquisa_BFS(int qtd_vertice, int **matriz, int *vet_visitado, int vertice_inicio, int *vet_ordem) {
     Tfila fila;
     inicializar_fila(&fila);
-
-    int inicio = vertice_inicio - 1;
     int posicao = 0;
 
-    vet_visitado[inicio] = 1;
-    vet_ordem[posicao] = vertice_inicio;
-    posicao++;
+    // Garante a visita a TODOS os vértices do grafo
+    for (int k = 0; k < qtd_vertice; k++) {
+        int v_atual = (k == 0) ? (vertice_inicio - 1) : k;
 
-    inserir_item_fila(&fila, inicio);
+        if (vet_visitado[v_atual] == 0) {
+            vet_visitado[v_atual] = 1;
+            vet_ordem[posicao] = v_atual + 1;
+            posicao++;
 
-    while (fila.inicio != NULL) {
-        int atual = fila.inicio->no;
-        tirar_item_da_fila(&fila);
+            inserir_item_fila(&fila, v_atual);
 
-        for (int j = 0; j < qtd_vertice; j++) {
-            if (matriz[atual][j] == 1 && vet_visitado[j] == 0) {
-                vet_visitado[j] = 1;
-                inserir_item_fila(&fila, j);
-                vet_ordem[posicao] = j + 1;
-                posicao++;
+            while (fila.inicio != NULL) {
+                int atual = fila.inicio->no;
+                tirar_item_da_fila(&fila);
+
+                for (int j = 0; j < qtd_vertice; j++) {
+                    if (matriz[atual][j] == 1 && vet_visitado[j] == 0) {
+                        vet_visitado[j] = 1;
+                        inserir_item_fila(&fila, j);
+                        vet_ordem[posicao] = j + 1;
+                        posicao++;
+                    }
+                }
             }
         }
     }
