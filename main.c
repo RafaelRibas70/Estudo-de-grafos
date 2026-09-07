@@ -65,7 +65,7 @@ int main() {
         switch (opcao) {
             case 0: {
                 int opcao_mod;
-                printf("\n0-Remover vertice\n1-Remover aresta\n2-Remover arco\n3-Adicionar vértice\n4-Adicionar aresta\n5-Adicionar arco\nOpcao: ");
+                printf("\n0-Remover vertice\n1-Remover aresta\n2-Remover arco\n3-Adicionar vertice\n4-Adicionar aresta\n5-Adicionar arco\nOpcao: ");
                 scanf("%d", &opcao_mod);
 
                 switch (opcao_mod) {

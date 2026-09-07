@@ -10,22 +10,24 @@ void pesquisa_DFS(int qtd_vertice, int **matriz, int *vet_visitado, int vertice_
     int inicio = vertice_inicio - 1;
     int posicao = 0;
 
-    vet_visitado[inicio] = 1;
-    vet_ordem[posicao] = vertice_inicio;
-    posicao++;
-
+    // Coloca apenas o vértice inicial na pilha
     inserir_item_da_pilha(&pilha, inicio);
 
     while (pilha.inicio != NULL) {
+        // Pega o vértice do topo e remove da pilha
         int atual = pilha.inicio->no;
         remover_item_da_pilha(&pilha);
 
-        for (int j = 0; j < qtd_vertice; j++) {
-            if (matriz[atual][j] == 1 && vet_visitado[j] == 0) {
-                vet_visitado[j] = 1;
-                inserir_item_da_pilha(&pilha, j);
-                vet_ordem[posicao] = j + 1;
-                posicao++;
+        // Se ainda não foi visitado, processa agora    
+        if (vet_visitado[atual] == 0) {
+            vet_visitado[atual] = 1;
+            vet_ordem[posicao] = atual + 1;
+            posicao++;
+
+            for (int j = qtd_vertice - 1; j >= 0; j--) {
+                if (matriz[atual][j] == 1 && vet_visitado[j] == 0) {
+                    inserir_item_da_pilha(&pilha, j);
+                }
             }
         }
     }
@@ -233,7 +235,7 @@ void verificar_conexidade_e_sfc(int qtd_vertice, int **matriz) {
     int num_sfc = 0;
     int eh_fortemente_conexo = 1;
 
-    printf("--- SUBGRAFOS FORTEMENTE CONEXOS MÁXIMOS (SFC) ---\n");
+    printf("--- Subgrafos fortemente conexos maximos (SFC) ---\n");
 
     for (int i = 0; i < qtd_vertice; i++) {
         if (visitado[i] == 0) {
@@ -260,12 +262,12 @@ void verificar_conexidade_e_sfc(int qtd_vertice, int **matriz) {
         }
     }
 
-    printf("\nAVALIAÇÃO DE CONEXIDADE:\n");
+    printf("\n Resultado da verificacao:\n");
     if (eh_fortemente_conexo == 1 && num_sfc == 1) {
         printf("-> O grafo É FORTEMENTE CONEXO.\n");
     } else {
-        printf("-> O grafo NÃO É fortemente conexo.\n");
-        printf("-> Total de subgrafos fortemente conexos máximos: %d\n", num_sfc);
+        printf("-> O grafo NAO É fortemente conexo.\n");
+        printf("-> Total de subgrafos fortemente conexos maximos: %d\n", num_sfc);
     }
 
     // Libera a memória alocada para os vetores
