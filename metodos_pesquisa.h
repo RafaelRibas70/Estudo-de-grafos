@@ -19,7 +19,7 @@ void print_matriz(int qtd_vertice, int **matriz);
 
 int mod_remove(int qtd_vertice, int **matriz, int vertice_origem, int vertice_destino, int mod);
 
-int mod_add(int qtd_vertice, int **matriz, int vertice_origem, int vertice_destino, int mod);
+int mod_add(int qtd_vertice, int **matriz, int vertice_origem, int vertice_destino, int mod, int valor_vertice);
 
 int** alocar_matriz(int n);
 
@@ -32,5 +32,15 @@ int** remover_vertice(int *qtd_vertice, int **matriz, int vertice_remover);
 //=========================CONEXIDADE E SUBGRAFOS======================
 
 void verificar_conexidade_e_sfc(int qtd_vertice, int **matriz);
+
+//=========================COLORACAO==================================
+
+void colorir_matriz(int qtd_vertice, int *resultado, int **matriz, int *ordem_pintura);
+
+//=========================DIJKSTRA===================================
+
+void alg_dijkstra (int vertice_partida, int qtd_vertice, int *resultado, int **matriz);
+
+void alg_aestrela (int vertice_partida, int vertice_destino, int qtd_vertice, int *estimativa, int **matriz, int *heuristica);
 
 #endif

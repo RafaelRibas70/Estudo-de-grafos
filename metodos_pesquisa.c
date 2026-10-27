@@ -67,7 +67,7 @@ void pesquisa_BFS(int qtd_vertice, int **matriz, int *vet_visitado, int vertice_
             }
         }
     }
-}
+}   
 
 void fecho_transitivo_direto(int qtd_vertice, int **matriz, int vertice_inicio, int *vet_fecho) {
     Tfila fila;
@@ -137,10 +137,10 @@ int mod_remove(int qtd_vertice, int **matriz, int vertice_origem, int vertice_de
         return -1;
     }
 
-    if (mod == 2) {
+    if (mod == 1) {
         matriz[vertice_origem - 1][vertice_destino - 1] = 0;
     }
-    if (mod == 1) {
+    if (mod == 2) {
         matriz[vertice_origem - 1][vertice_destino - 1] = 0;
         matriz[vertice_destino - 1][vertice_origem - 1] = 0;
     }
@@ -148,17 +148,17 @@ int mod_remove(int qtd_vertice, int **matriz, int vertice_origem, int vertice_de
     return 0;
 }
 
-int mod_add(int qtd_vertice, int **matriz, int vertice_origem, int vertice_destino, int mod) {
+int mod_add(int qtd_vertice, int **matriz, int vertice_origem, int vertice_destino, int mod, int valor_vertice) {
     if (vertice_origem > qtd_vertice || vertice_destino > qtd_vertice || vertice_origem < 1 || vertice_destino < 1) {
         return -1;
     }
 
-    if (mod == 2) {
-        matriz[vertice_origem - 1][vertice_destino - 1] = 1;
-    }
     if (mod == 1) {
-        matriz[vertice_origem - 1][vertice_destino - 1] = 1;
-        matriz[vertice_destino - 1][vertice_origem - 1] = 1;
+        matriz[vertice_origem - 1][vertice_destino - 1] = valor_vertice;
+    }
+    if (mod == 2) {
+        matriz[vertice_origem - 1][vertice_destino - 1] = valor_vertice;
+        matriz[vertice_destino - 1][vertice_origem - 1] = valor_vertice;
     }
 
     return 0;
@@ -282,4 +282,251 @@ void verificar_conexidade_e_sfc(int qtd_vertice, int **matriz) {
     free(fecho_dir);
     free(fecho_inv);
     free(visitado);
+}
+
+
+//=========================COLORACAO==================================
+void colorir_matriz(int qtd_vertice, int *resultado, int **matriz, int *ordem_pintura) {
+
+    int *vertice_grau = calloc(qtd_vertice, sizeof(int));
+    int *pintado = calloc(qtd_vertice, sizeof(int));
+
+    int contador_ordem = 0;
+    int maior_grau;
+    int vertice_maior;
+    int cor;
+    int cor_usada;
+
+    // Inicializa os vetores.
+    for (int i = 0; i < qtd_vertice; i++) {
+        resultado[i] = 0;
+        ordem_pintura[i] = 0;
+
+        // Calcula o grau de cada vértice.
+        for (int j = 0; j < qtd_vertice; j++) {
+            if (matriz[i][j] != 0) {
+                vertice_grau[i]++;
+            }
+        }
+    }
+
+    // Repete até que todos os vértices sejam pintados.
+    for (int k = 0; k < qtd_vertice; k++) {
+
+        // Escolhe o vértice não pintado de maior grau.
+        maior_grau = -1;
+        vertice_maior = -1;
+
+        for (int i = 0; i < qtd_vertice; i++) {
+            if (pintado[i] == 0 && vertice_grau[i] > maior_grau) {
+                maior_grau = vertice_grau[i];
+                vertice_maior = i;
+            }
+        }
+
+        // Se não houver vértice disponível, encerra.
+        if (vertice_maior == -1) {
+            break;
+        }
+
+        // Registra a ordem em que o vértice foi escolhido.
+        ordem_pintura[contador_ordem] = vertice_maior + 1;
+        contador_ordem++;
+
+        // Procura a menor cor que não esteja nos vizinhos.
+        cor = 1;
+
+        do {
+            cor_usada = 0;
+
+            for (int j = 0; j < qtd_vertice; j++) {
+                if (matriz[vertice_maior][j] != 0 &&
+                    resultado[j] == cor) {
+                    cor_usada = 1;
+                    break;
+                }
+            }
+
+            if (cor_usada) {
+                cor++;
+            }
+
+        } while (cor_usada);
+
+        // Atribui a cor ao vértice escolhido.
+        resultado[vertice_maior] = cor;
+        pintado[vertice_maior] = 1;
+    }
+
+    free(vertice_grau);
+    free(pintado);
+}
+//=========================DIJKSTRA===================================
+
+void alg_dijkstra (int vertice_partida, int qtd_vertice, int *estimativa, int **matriz){
+
+    int precedente[qtd_vertice];
+    int visitado[qtd_vertice];
+    int infinito = 9999999;
+
+    for (int i = 0; i < qtd_vertice; i++){
+        estimativa[i] = infinito;
+        precedente[i] = -1;
+        visitado[i] = 0;
+    }
+
+    estimativa[vertice_partida] = 0;
+
+    int atual = vertice_partida;
+
+    for (int i = 0; i < qtd_vertice; i++){
+        for (int j = 0; j < qtd_vertice; j++){
+            if (matriz[atual][j] != 0 && visitado[j] == 0){
+                int nova_estimativa = estimativa[atual] + matriz[atual][j];
+                if (nova_estimativa < estimativa[j]){
+                    estimativa[j] = nova_estimativa;
+                    precedente[j] = atual;
+                }
+            }
+        }
+
+        visitado[atual] = 1;
+        int menor = infinito;
+        int proximo = -1;
+
+        for (int j = 0; j < qtd_vertice; j++){
+            if (visitado[j] == 0 && estimativa[j] < menor){
+                menor = estimativa[j];
+                proximo = j;
+            }
+        }
+
+        if (proximo == -1){
+            break;
+        }
+        atual = proximo;
+    }
+}
+//=========================ALG_ESTRELA===================================
+/*
+void alg_aestrela (int vertice_partida, int vertice_destino, int qtd_vertice, int *estimativa, int **matriz, int *heuristica){
+    int precedente[qtd_vertice];
+    int visitado[qtd_vertice];
+    int infinito = 9999999;
+
+    for (int i = 0; i < qtd_vertice; i++){
+        estimativa[i] = infinito;
+        precedente[i] = -1;
+        visitado[i] = 0;
+    }
+
+    estimativa[vertice_partida] = 0;
+    int atual = vertice_partida;
+
+    for (int i = 0; i < qtd_vertice; i++){
+        if (atual == vertice_destino){
+            break;
+        }
+
+        for (int j = 0; j < qtd_vertice; j++){
+            if (matriz[atual][j] != 0 && visitado[j] == 0){
+                int nova_estimativa = estimativa[atual] + matriz[atual][j];
+
+                if (nova_estimativa < estimativa[j]){
+                    estimativa[j] = nova_estimativa;
+                    precedente[j] = atual;
+                }
+            }
+        }
+
+        visitado[atual] = 1;
+
+        int menor = infinito;
+        int proximo = -1;
+
+        for (int j = 0; j < qtd_vertice; j++){
+            if (visitado[j] == 0 && estimativa[j] != infinito){
+                int f = estimativa[j] + heuristica[j];
+
+                if (f < menor){
+                    menor = f;
+                    proximo = j;
+                }
+            }
+        }
+
+        if (proximo == -1){
+            break;
+        }
+
+        atual = proximo;
+    }
+
+
+}
+*/
+void alg_aestrela (int vertice_partida, int vertice_destino, int qtd_vertice, int *estimativa, int **matriz, int *heuristica)
+{
+    int f[qtd_vertice];
+    int visitado[qtd_vertice];
+    int infinito = 9999999;
+
+    // Inicializa os vetores
+    for (int i = 0; i < qtd_vertice; i++) {
+        estimativa[i] = infinito;
+        f[i] = infinito;
+        visitado[i] = 0;
+    }
+
+    // Vértice inicial
+    estimativa[vertice_partida] = 0;
+    f[vertice_partida] = heuristica[vertice_partida];
+
+    while (1) {
+
+        int atual = -1;
+        int menor_f = infinito;
+
+        // Escolhe o vértice com menor f(n)
+        for (int i = 0; i < qtd_vertice; i++) {
+
+            if (visitado[i] == 0 && f[i] < menor_f) {
+                menor_f = f[i];
+                atual = i;
+            }
+        }
+
+        // Não existe mais caminho
+        if (atual == -1) {
+            break;
+        }
+
+        // Chegou ao destino
+        if (atual == vertice_destino) {
+            break;
+        }
+
+        visitado[atual] = 1;
+
+        // Analisa os vizinhos
+        for (int i = 0; i < qtd_vertice; i++) {
+
+            if (matriz[atual][i] != 0 && visitado[i] == 0) {
+
+                // Calcula o novo custo real g(n)
+                int nova_estimativa =
+                    estimativa[atual] + matriz[atual][i];
+
+                // Encontrou um caminho melhor
+                if (nova_estimativa < estimativa[i]) {
+
+                    // Guarda o custo real no vetor resultado
+                    estimativa[i] = nova_estimativa;
+
+                    // Calcula f(n) = g(n) + h(n)
+                    f[i] = estimativa[i] + heuristica[i];
+                }
+            }
+        }
+    }
 }
